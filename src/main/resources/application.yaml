@@ -1,0 +1,48 @@
+quarkus:
+
+  application:
+    name: inventory-service
+
+  datasource:
+    db-kind: postgresql
+    username: postgres
+    password: 12345
+
+    reactive:
+      url: vertx-reactive:postgresql://localhost:15432/dvdrental
+
+    metrics:
+      enabled: true
+
+  hibernate-orm:
+    physical-naming-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+    log:
+      bind-parameters: true
+      sql: true
+
+  http:
+    port: 18182
+
+  log:
+    console:
+      format: "%d{HH:mm:ss} %-5p traceId=%X{traceId}, parentId=%X{parentId}, spanId=%X{spanId}, sampled=%X{sampled} [%c{2.}] (%t) %s%e%n"
+    min-level: TRACE
+    handler:
+      gelf:
+        enabled: true
+        host: localhost
+        port: 12201
+        include-full-mdc: true
+        additional-field:
+          applicationName:
+            value: ${quarkus.application.name}
+            type: string
+
+  otel:
+    exporter:
+      otlp:
+        traces:
+          endpoint: http://localhost:4317
+
+  resteasy-reactive:
+    path: /api
